@@ -23,36 +23,6 @@ Patch0:     phpMyAdmin-certs.patch
 BuildArch:	noarch
 BuildRequires: gnupg2
 
-Requires:	nginx-filesystem
-Requires:	httpd-filesystem
-Requires:	php(httpd)
-Suggests:	httpd
-
-# From composer.json, "require": {
-#        "php": ">=5.5.0",
-#        "ext-mysqli": "*",
-#        "ext-xml": "*",
-#        "ext-pcre": "*",
-#        "ext-json": "*",
-#        "ext-ctype": "*",
-#        "ext-hash": "*",
-#        "phpmyadmin/sql-parser": "^4.3.2",
-#        "phpmyadmin/motranslator": "^4.0",
-#        "phpmyadmin/shapefile": "^2.0",
-#        "tecnickcom/tcpdf": "^6.2",
-#        "phpseclib/phpseclib": "^2.0",
-#        "google/recaptcha": "^1.1",
-#        "psr/container": "^1.0",
-#        "twig/twig": "^1.34 || ^2.0",
-#        "twig/extensions": "~1.5.1",
-#        "symfony/expression-language": "^3.2 || ^2.8",
-#        "symfony/polyfill-mbstring": "^1.3"
-#    "conflict": {
-#        "phpseclib/phpseclib": "2.0.8",
-#        "tecnickcom/tcpdf": "<6.2",
-#        "pragmarx/google2fa": "<3.0.1",
-#        "bacon/bacon-qr-code": "<1.0",
-#        "samyoul/u2f-php-server": "<1.1"
 Requires:  php(language) >= 5.5
 Requires:  php-mysqli
 Requires:  php-xml
@@ -60,31 +30,6 @@ Requires:  php-pcre
 Requires:  php-json
 Requires:  php-ctype
 Requires:  php-hash
-Requires:  (php-composer(phpmyadmin/sql-parser)       >= 4.3.2 with php-composer(phpmyadmin/sql-parser)       < 5)
-Requires:  (php-composer(phpmyadmin/motranslator)     >= 4.0   with php-composer(phpmyadmin/motranslator)     < 5)
-Requires:  (php-composer(phpmyadmin/shapefile)        >= 2.0   with php-composer(phpmyadmin/shapefile)        < 3)
-Requires:  (php-composer(phpseclib/phpseclib)         >= 2.0.9 with php-composer(phpseclib/phpseclib)         < 3)
-Requires:  (php-composer(google/recaptcha)            >= 1.1   with php-composer(google/recaptcha)            < 2)
-Requires:  (php-composer(psr/container)               >= 1.0   with php-composer(psr/container)               < 2)
-Requires:  (php-composer(twig/twig)                   >= 1.34  with php-composer(twig/twig)                   < 3)
-Requires:  (php-composer(twig/extensions)             >= 1.5.1 with php-composer(twig/extensions)             < 2)
-Requires:  (php-composer(symfony/expression-language) >= 2.8   with php-composer(symfony/expression-language) < 4)
-Requires:  (php-composer(symfony/polyfill-mbstring)   >= 1.3   with php-composer(symfony/polyfill-mbstring)   < 2)
-# Autoloader
-Requires:  php-composer(fedora/autoloader)
-# From composer.json, "suggest": {
-#        "ext-openssl": "Cookie encryption",
-#        "ext-curl": "Updates checking",
-#        "ext-opcache": "Better performance",
-#        "ext-zlib": "For gz import and export",
-#        "ext-bz2": "For bzip2 import and export",
-#        "ext-zip": "For zip import and export",
-#        "ext-gd2": "For image transformations",
-#        "ext-mbstring": "For best performance",
-#        "tecnickcom/tcpdf": "For PDF support",
-#        "pragmarx/google2fa": "For 2FA authentication",
-#        "bacon/bacon-qr-code": "For 2FA authentication",
-#        "samyoul/u2f-php-server": "For FIDO U2F authentication"
 Requires:  php-openssl
 Requires:  php-curl
 Requires:  php-zlib
@@ -93,10 +38,6 @@ Requires:  php-zip
 Requires:  php-gd
 Requires:  php-mbstring
 Recommends: php-opcache
-Recommends: php-composer(tecnickcom/tcpdf)       >= 6.2
-Recommends: php-composer(pragmarx/google2fa)     >= 3.0.1
-Recommends: php-composer(bacon/bacon-qr-code)    >= 1.0
-Recommends: php-composer(samyoul/u2f-php-server) >= 1.1
 Recommends: php-tcpdf-dejavu-sans-fonts          >= 6.2
 # From phpcompatinfo reports for 4.8.0
 Requires:  php-date
@@ -110,13 +51,6 @@ Requires:  php-spl
 Requires:  php-xmlwriter
 # System certificates
 Requires:  ca-certificates
-
-# Bundled JS library
-Provides:  bundled(js-codemirror)
-Provides:  bundled(js-jqplot) = 1.0.9
-Provides:  bundled(js-jquery) = 3.2.1
-Provides:  bundled(js-openlayers)
-Provides:  bundled(js-tracekit)
 
 Provides:  phpmyadmin = %{version}-%{release}
 
@@ -146,53 +80,6 @@ like displaying BLOB-data as image or download-link and much more...
 
 %setup -q -n %{pkgname}-%{version}-all-languages
 %patch0 -p1
-
-# Setup vendor config file
-sed -e "/'CHANGELOG_FILE'/s@./ChangeLog@%{_pkgdocdir}/ChangeLog@" \
-    -e "/'LICENSE_FILE'/s@./LICENSE@%{_pkgdocdir}/LICENSE@" \
-    -e "/'CONFIG_DIR'/s@''@'%{_sysconfdir}/%{name}/'@" \
-    -e "/'SETUP_CONFIG_FILE'/s@./config/config.inc.php@%{_localstatedir}/lib/%{pkgname}/config/config.inc.php@" \
-%if 0%{?_licensedir:1}
-    -e '/LICENSE_FILE/s:%_defaultdocdir:%_defaultlicensedir:' \
-%endif
-    -e '/AUTOLOAD_FILE/s@./vendor@%{_datadir}/%{name}/vendor@' \
-    -e '/TEMP_DIR/s@./tmp@%{_localstatedir}/lib/%{name}/temp@' \
-    -i libraries/vendor_config.php
-
-# Generate autoloader
-rm -rf vendor/*
-cat << 'EOF' | tee vendor/autoload.php
-<?php
-/* Autoloader for phpMyAdmin and its dependencies */
-
-require_once '%{_datadir}/php/Fedora/Autoloader/autoload.php';
-\Fedora\Autoloader\Autoload::addPsr4('PhpMyAdmin\\',        dirname(__DIR__) . '/libraries/classes');
-\Fedora\Autoloader\Autoload::addPsr4('PhpMyAdmin\\Setup\\', dirname(__DIR__) . '/setup/lib');
-\Fedora\Autoloader\Dependencies::required([
-    '%{_datadir}/php/PhpMyAdmin/SqlParser/autoload.php',
-    '%{_datadir}/php/PhpMyAdmin/MoTranslator/autoload.php',
-    '%{_datadir}/php/PhpMyAdmin/ShapeFile/autoload.php',
-    '%{_datadir}/php/phpseclib/autoload.php',
-    '%{_datadir}/php/ReCaptcha/autoload.php',
-    '%{_datadir}/php/Psr/Container/autoload.php',
-    [
-        '%{_datadir}/php/Twig2/autoload.php',
-        '%{_datadir}/php/Twig/autoload.php',
-    ],
-    '%{_datadir}/php/Twig/Extensions/autoload.php',
-    [
-        '%{_datadir}/php/Symfony3/Component/ExpressionLanguage/autoload.php',
-        '%{_datadir}/php/Symfony/Component/ExpressionLanguage/autoload.php',
-    ],
-    '%{_datadir}/php/Symfony/Polyfill/autoload.php',
-]);
-\Fedora\Autoloader\Dependencies::optional([
-    '%{_datadir}/php/tcpdf/autoload.php',
-    '%{_datadir}/php/PragmaRX/Google2FA/autoload.php',
-    '%{_datadir}/php/BaconQrCode/autoload.php',
-    '%{_datadir}/php/Samyoul/U2F/U2FServer/autoload.php',
-]);
-EOF
 
 
 %build
