@@ -37,8 +37,6 @@ Requires:  php-bz2
 Requires:  php-zip
 Requires:  php-gd
 Requires:  php-mbstring
-Recommends: php-opcache
-Recommends: php-tcpdf-dejavu-sans-fonts          >= 6.2
 # From phpcompatinfo reports for 4.8.0
 Requires:  php-date
 Requires:  php-filter
