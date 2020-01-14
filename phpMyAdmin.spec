@@ -4,7 +4,7 @@
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
 Version:	4.9.4
-Release:	1%{?dist}
+Release:	2%{?dist}
 # MIT (js/jquery/, js/jqplot, js/codemirror/, js/tracekit/)
 # BSD (js/openlayers/)
 # GPLv2+ (the rest)
@@ -79,6 +79,16 @@ like displaying BLOB-data as image or download-link and much more...
 %setup -q -n %{pkgname}-%{version}-all-languages
 %patch0 -p1
 
+# Setup vendor config file
+sed -e "/'CHANGELOG_FILE'/s@./ChangeLog@%{_pkgdocdir}/ChangeLog@" \
+    -e "/'LICENSE_FILE'/s@./LICENSE@%{_pkgdocdir}/LICENSE@" \
+    -e "/'CONFIG_DIR'/s@''@'%{_sysconfdir}/%{pkgname}/'@" \
+    -e "/TEMP_DIR/s@'./tmp/'@'%{_localstatedir}/lib/%{name}/temp'@" \
+%if 0%{?_licensedir:1}
+    -e '/LICENSE_FILE/s:%_defaultdocdir:%_defaultlicensedir:' \
+%endif
+    -i libraries/vendor_config.php
+
 
 %build
 
@@ -136,6 +146,9 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$SECRET/" \
 
 
 %changelog
+* Tue Jan 14 2020 Massimiliano Torromeo <massimiliano.torromeo@gmail.com> - 4.9.4-2
+- Fixed vendor_config
+
 * Wed Jan  8 2020 Remi Collet <remi@remirepo.net> - 4.9.4-1
 - update to 4.9.4 (2020-01-08, security release)
 
