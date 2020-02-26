@@ -4,7 +4,7 @@
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
 Version:	4.9.4
-Release:	2%{?dist}
+Release:	3%{?dist}
 # MIT (js/jquery/, js/jqplot, js/codemirror/, js/tracekit/)
 # BSD (js/openlayers/)
 # GPLv2+ (the rest)
@@ -23,30 +23,6 @@ Patch0:     phpMyAdmin-certs.patch
 BuildArch:	noarch
 BuildRequires: gnupg2
 
-Requires:  php(language) >= 5.5
-Requires:  php-mysqli
-Requires:  php-xml
-Requires:  php-pcre
-Requires:  php-json
-Requires:  php-ctype
-Requires:  php-hash
-Requires:  php-openssl
-Requires:  php-curl
-Requires:  php-zlib
-Requires:  php-bz2
-Requires:  php-zip
-Requires:  php-gd
-Requires:  php-mbstring
-# From phpcompatinfo reports for 4.8.0
-Requires:  php-date
-Requires:  php-filter
-Requires:  php-iconv
-Requires:  php-libxml
-Requires:  php-recode
-Requires:  php-session
-Requires:  php-simplexml
-Requires:  php-spl
-Requires:  php-xmlwriter
 # System certificates
 Requires:  ca-certificates
 
@@ -146,6 +122,9 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$SECRET/" \
 
 
 %changelog
+* Wed Jan 26 2020 Massimiliano Torromeo <massimiliano.torromeo@gmail.com> - 4.9.4-3
+- Removed dependencies from php packages
+
 * Tue Jan 14 2020 Massimiliano Torromeo <massimiliano.torromeo@gmail.com> - 4.9.4-2
 - Fixed vendor_config
 
