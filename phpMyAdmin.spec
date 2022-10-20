@@ -1,101 +1,203 @@
-%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
-%global pkgname	phpMyAdmin
+# Fedora spec file for phpMyAdmin
+#
+# License: MIT
+# http://opensource.org/licenses/MIT
+#
+# Please, preserve the changelog entries
+#
+%{!?_pkgdocdir: %global _pkgdocdir %{_datadir}/doc/%{name}-%{version}}
 
-Summary:	Handle the administration of MySQL over the World Wide Web
-Name:		phpMyAdmin
-Version:	4.9.4
-Release:	3%{?dist}
+%global upstream_version 5.2.0
+#global upstream_prever  rc1
+
+Name: phpMyAdmin
+Version: %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
+Release: 2%{?dist}
+Summary: A web interface for MySQL and MariaDB
+
 # MIT (js/jquery/, js/jqplot, js/codemirror/, js/tracekit/)
 # BSD (js/openlayers/)
 # GPLv2+ (the rest)
-License:	GPLv2+ and MIT and BSD
-URL:		https://www.phpmyadmin.net/
-Source0:	https://files.phpmyadmin.net/%{name}/%{version}/%{name}-%{version}-all-languages.tar.xz
-Source1:	https://files.phpmyadmin.net/%{name}/%{version}/%{name}-%{version}-all-languages.tar.xz.asc
-Source2:	phpMyAdmin-config.inc.php
-Source3:	phpMyAdmin.htaccess
-Source4:	phpMyAdmin.nginx
-Source5:	https://files.phpmyadmin.net/phpmyadmin.keyring
+# BSD:     bacon/bacon-qr-code, dasprid/enum, google/recaptcha, nikic/fast-route,
+#          code-lts/u2f-php-server, twig/twig
+# MIT:     paragonie/constant_time_encoding, phpmyadmin/twig-i18n-extension,
+#          phpseclib/phpseclib, pragmarx/google2fa, pragmarx/google2fa-qrcode,
+#          psr/*, symfony/*
+# GPLv2+:  phpmyadmin/motranslator, phpmyadmin/shapefile, phpmyadmin/sql-parser
+# LGPLv3:  tecnickcom/tcpdf
+# MPLv2.0: williamdes/mariadb-mysql-kbs
+License: GPLv2+ and MIT and BSD and LGPLv3 and MPLv2.0
+URL: https://www.phpmyadmin.net/
+Source0: https://files.phpmyadmin.net/%{name}/%{upstream_version}%{?upstream_prever:-%upstream_prever}/%{name}-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages.tar.xz
+Source1: https://files.phpmyadmin.net/%{name}/%{upstream_version}%{?upstream_prever:-%upstream_prever}/%{name}-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages.tar.xz.asc
+Source4: https://files.phpmyadmin.net/phpmyadmin.keyring
+# List name / version / license of bundled libraries
+Source5: phpMyAdmin-bundled.php
 
 # Redirect to system certificates
-Patch0:     phpMyAdmin-certs.patch
+Patch0:  phpMyAdmin-certs.patch
 
-BuildArch:	noarch
+BuildArch: noarch
 BuildRequires: gnupg2
+# to run phpMyAdmin-bundled.php
+BuildRequires: php(language) >= 7.2.5
+BuildRequires: php-cli
+BuildRequires: php-json
+
+Requires(post): coreutils sed
+# From composer.json, "require": {
+#        "google/recaptcha": "^1.1",
+#        "nikic/fast-route": "^1.3",
+#        "phpmyadmin/motranslator": "^5.0",
+#        "phpmyadmin/shapefile": "^2.0",
+#        "phpmyadmin/sql-parser": "^5.5",
+#        "phpmyadmin/twig-i18n-extension": "^3.0",
+#        "phpseclib/phpseclib": "^2.0",
+#        "symfony/config": "^4.4.9",
+#        "symfony/dependency-injection": "^4.4.9",
+#        "symfony/expression-language": "^4.4.9",
+#        "symfony/polyfill-ctype": "^1.17.0",
+#        "symfony/polyfill-mbstring": "^1.17.0",
+#        "twig/twig": "^2.14.9 || ^3.3.5",
+#        "williamdes/mariadb-mysql-kbs": "^1.2"
+
+Provides:  bundled(php-bacon-bacon-qr-code) = 2.0.7
+Provides:  bundled(php-code-lts-u2f-php-server) = v1.2.0
+Provides:  bundled(php-composer-ca-bundle) = 1.3.1
+Provides:  bundled(php-dasprid-enum) = 1.0.3
+Provides:  bundled(php-fig-http-message-util) = 1.1.5
+Provides:  bundled(php-google-recaptcha) = 1.2.4
+Provides:  bundled(php-nikic-fast-route) = v1.3.0
+Provides:  bundled(php-paragonie-constant-time-encoding) = v2.5.0
+Provides:  bundled(php-paragonie-random-compat) = v9.99.100
+Provides:  bundled(php-paragonie-sodium-compat) = v1.17.1
+Provides:  bundled(php-phpmyadmin-motranslator) = 5.3.0
+Provides:  bundled(php-phpmyadmin-shapefile) = 3.0.1
+Provides:  bundled(php-phpmyadmin-sql-parser) = 5.5.0
+Provides:  bundled(php-phpmyadmin-twig-i18n-extension) = v4.0.1
+Provides:  bundled(php-pragmarx-google2fa) = 8.0.0
+Provides:  bundled(php-pragmarx-google2fa-qrcode) = v2.1.1
+Provides:  bundled(php-psr-cache) = 1.0.1
+Provides:  bundled(php-psr-container) = 1.1.1
+Provides:  bundled(php-psr-http-factory) = 1.0.1
+Provides:  bundled(php-psr-http-message) = 1.0.1
+Provides:  bundled(php-psr-log) = 1.1.4
+Provides:  bundled(php-ralouphie-getallheaders) = 3.0.3
+Provides:  bundled(php-slim-psr7) = 1.4
+Provides:  bundled(php-symfony-cache) = v5.4.8
+Provides:  bundled(php-symfony-cache-contracts) = v2.5.1
+Provides:  bundled(php-symfony-config) = v5.4.8
+Provides:  bundled(php-symfony-dependency-injection) = v5.4.8
+Provides:  bundled(php-symfony-deprecation-contracts) = v2.5.1
+Provides:  bundled(php-symfony-expression-language) = v5.4.8
+Provides:  bundled(php-symfony-filesystem) = v5.4.7
+Provides:  bundled(php-symfony-polyfill-ctype) = v1.25.0
+Provides:  bundled(php-symfony-polyfill-mbstring) = v1.25.0
+Provides:  bundled(php-symfony-polyfill-php73) = v1.25.0
+Provides:  bundled(php-symfony-polyfill-php80) = v1.25.0
+Provides:  bundled(php-symfony-polyfill-php81) = v1.25.0
+Provides:  bundled(php-symfony-service-contracts) = v2.5.1
+Provides:  bundled(php-symfony-var-exporter) = v5.4.8
+Provides:  bundled(php-tecnickcom-tcpdf) = 6.4.4
+Provides:  bundled(php-twig-twig) = v3.3.10
+Provides:  bundled(php-webmozart-assert) = 1.10.0
+Provides:  bundled(php-williamdes-mariadb-mysql-kbs) = v1.2.13
 
 # System certificates
 Requires:  ca-certificates
 
-Provides:  phpmyadmin = %{version}-%{release}
+# Bundled JS library
+Provides:  bundled(js-codemirror)
+Provides:  bundled(js-jqplot) = 1.0.9
+Provides:  bundled(js-jquery) = 3.2.1
+Provides:  bundled(js-openlayers)
+Provides:  bundled(js-tracekit)
+
+Provides:  php-composer(phpmyadmin/phpmyadmin) = %{version}
+# Allow lowercase in install command
+Provides:  phpmyadmin   =  %{version}-%{release}
 
 
 %description
 phpMyAdmin is a tool written in PHP intended to handle the administration of
-MySQL over the World Wide Web. Most frequently used operations are supported
-by the user interface (managing databases, tables, fields, relations, indexes,
-users, permissions), while you still have the ability to directly execute any
-SQL statement.
+MySQL over the Web. Currently it can create and drop databases,
+create/drop/alter tables, delete/edit/add fields, execute any SQL statement,
+manage keys on fields, manage privileges,export data into various formats and
+is available in 50 languages
 
-Features include an intuitive web interface, support for most MySQL features
-(browse and drop databases, tables, views, fields and indexes, create, copy,
-drop, rename and alter databases, tables, fields and indexes, maintenance
-server, databases and tables, with proposals on server configuration, execute,
-edit and bookmark any SQL-statement, even batch-queries, manage MySQL users
-and privileges, manage stored procedures and triggers), import data from CSV
-and SQL, export data to various formats: CSV, SQL, XML, PDF, OpenDocument Text
-and Spreadsheet, Word, Excel, LATEX and others, administering multiple servers,
-creating PDF graphics of your database layout, creating complex queries using
-Query-by-example (QBE), searching globally in a database or a subset of it,
-transforming stored data into any format using a set of predefined functions,
-like displaying BLOB-data as image or download-link and much more...
 
 %prep
-%{?gpgverify:%{gpgverify} --keyring='%{SOURCE5}' --signature='%{SOURCE1}' --data='%{SOURCE0}'}
+%{?gpgverify:%{gpgverify} --keyring='%{SOURCE4}' --signature='%{SOURCE1}' --data='%{SOURCE0}'}
 
-%setup -q -n %{pkgname}-%{version}-all-languages
+%setup -qn phpMyAdmin-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages
 %patch0 -p1
+rm -r vendor/composer/ca-bundle/res/
+
+# Minimal configuration file
+sed -e "/'blowfish_secret'/s@''@'MUSTBECHANGEDONINSTALL'@"  \
+    -e "/'UploadDir'/s@''@'%{_localstatedir}/lib/%{name}/upload'@"  \
+    -e "/'SaveDir'/s@''@'%{_localstatedir}/lib/%{name}/save'@" \
+    config.sample.inc.php >CONFIG
 
 # Setup vendor config file
-sed -e "/'CHANGELOG_FILE'/s@./ChangeLog@%{_pkgdocdir}/ChangeLog@" \
-    -e "/'LICENSE_FILE'/s@./LICENSE@%{_pkgdocdir}/LICENSE@" \
-    -e "/'CONFIG_DIR'/s@''@'%{_sysconfdir}/%{pkgname}/'@" \
-    -e "/TEMP_DIR/s@'./tmp/'@'%{_localstatedir}/lib/%{name}/temp'@" \
+sed -e "/'changeLogFile'/s@ROOT_PATH@'%{_pkgdocdir}/'@" \
+    -e "/'licenseFile'/s@ROOT_PATH@'%{_pkgdocdir}/'@" \
+    -e "/'configFile'/s@ROOT_PATH@'%{_sysconfdir}/%{name}/'@" \
 %if 0%{?_licensedir:1}
-    -e '/LICENSE_FILE/s:%_defaultdocdir:%_defaultlicensedir:' \
+    -e '/licenseFile/s:%_defaultdocdir:%_defaultlicensedir:' \
 %endif
+    -e "/versionSuffix/s/''/'-%{release}'/" \
+    -e "/tempDir/s@ROOT.*tmp'@'%{_localstatedir}/lib/%{name}/temp'@" \
+    -e "/cacheDir/s@ROOT.*cache'@'%{_localstatedir}/lib/%{name}/cache'@" \
     -i libraries/vendor_config.php
+
+# For debug
+grep '=>' libraries/vendor_config.php
+
+php %{SOURCE5} vendor/composer/installed.json
 
 
 %build
+# Nothing to do
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{pkgname}
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/%{pkgname}/{upload,save,config,temp}/
-cp -ad * $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/
-install -Dpm 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
-install -Dpm 0640 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/%{pkgname}/config.inc.php
-install -Dpm 0644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/default.d/%{pkgname}.conf
+mkdir -p %{buildroot}/%{_datadir}/%{name}
+cp -ad ./* %{buildroot}/%{_datadir}/%{name}
+install -Dpm 0640 CONFIG %{buildroot}/%{_sysconfdir}/%{name}/config.inc.php
 
-rm -f $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/{[CDLR]*,*.txt,config.sample.inc.php}
-rm -rf $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/{doc,examples}/
-rm -f doc/html/.buildinfo
-rm $RPM_BUILD_ROOT/%{_datadir}/%{name}/composer.*
+mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/{upload,save,config,temp}
+
+rm -f %{buildroot}/%{_datadir}/%{name}/config.sample.inc.php
+rm -f %{buildroot}/%{_datadir}/%{name}/*txt
+rm -f %{buildroot}/%{_datadir}/%{name}/[CDLR]*
+rm -f %{buildroot}/%{_datadir}/%{name}/libraries/.htaccess
+rm -f %{buildroot}/%{_datadir}/%{name}/setup/lib/.htaccess
+rm -f %{buildroot}/%{_datadir}/%{name}/setup/frames/.htaccess
+rm -rf %{buildroot}%{_datadir}/%{name}/contrib
+rm     %{buildroot}%{_datadir}/%{name}/composer.*
+rm -rf %{buildroot}%{_datadir}/%{name}/tmp/
+mv     %{buildroot}%{_datadir}/%{name}/libraries/cache %{buildroot}/%{_localstatedir}/lib/%{name}/cache
 
 # JS libraries sources
-#rm -r %{buildroot}%{_datadir}/%{name}/js/jquery/src
-#rm -r %{buildroot}%{_datadir}/%{name}/js/openlayers/src
+#rm -r %%{buildroot}%%{_datadir}/%{name}/js/jquery/src
+#rm -r %%{buildroot}%%{_datadir}/%{name}/js/openlayers/src
 
-# Bundled certificates
-rm -r %{buildroot}%{_datadir}/%{name}/libraries/certs
+# documentation
+rm -rf    %{buildroot}%{_datadir}/%{name}/examples/
+rm -rf    %{buildroot}%{_datadir}/%{name}/doc/
+mkdir -p  %{buildroot}%{_datadir}/%{name}/doc/
+ln -s %{_pkgdocdir}/html  %{buildroot}%{_datadir}/%{name}/doc/html
 
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/doc/
-ln -s ../../../..%{_pkgdocdir}/html/ $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/doc/html
-mv -f config.sample.inc.php examples/
+mv -f %{buildroot}%{_datadir}/%{name}/js/vendor/jquery/MIT-LICENSE.txt LICENSE-jquery
+mv -f %{buildroot}%{_datadir}/%{name}/js/vendor/codemirror/LICENSE LICENSE-codemirror
 
-mv -f $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/js/vendor/jquery/MIT-LICENSE.txt LICENSE-jquery
-mv -f $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/js/vendor/codemirror/LICENSE LICENSE-codemirror
 
+%pretrans
+# allow dir to link upgrade
+if  [ -d %{_datadir}/%{name}/doc/html ]; then
+  rm -rf %{_datadir}/%{name}/doc/html
+fi
 
 %post
 # generate a 32 chars secret key for this install
@@ -107,32 +209,106 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$SECRET/" \
 %files
 %{!?_licensedir:%global license %%doc}
 %license LICENSE*
-%doc ChangeLog README DCO doc/html/ examples/
+%doc ChangeLog README CONTRIBUTING.md config.sample.inc.php
+%doc doc/html/
+%doc examples/
 %doc composer.json
-%{_datadir}/%{pkgname}/
-%dir %attr(0750,root,apache) %{_sysconfdir}/%{pkgname}/
-%config(noreplace) %attr(0640,root,apache) %{_sysconfdir}/%{pkgname}/config.inc.php
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
-%config(noreplace) %{_sysconfdir}/nginx/default.d/%{pkgname}.conf
-%dir %{_localstatedir}/lib/%{pkgname}/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/upload/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/save/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/config/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/temp/
+%{_datadir}/%{name}
+%attr(0750,root,apache) %dir %{_sysconfdir}/%{name}
+%config(noreplace) %attr(0640,root,apache) %{_sysconfdir}/%{name}/config.inc.php
+%dir %{_localstatedir}/lib/%{name}/
+%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{name}/upload
+%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{name}/save
+%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{name}/config
+%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{name}/temp
+%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{name}/cache
+     %attr(0640,apache,apache) %{_localstatedir}/lib/%{name}/cache/*
 
 
 %changelog
-* Wed Jan 26 2020 Massimiliano Torromeo <massimiliano.torromeo@gmail.com> - 4.9.4-3
-- Removed dependencies from php packages
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
-* Tue Jan 14 2020 Massimiliano Torromeo <massimiliano.torromeo@gmail.com> - 4.9.4-2
-- Fixed vendor_config
+* Thu May 12 2022 Remi Collet <remi@remirepo.net> - 5.2.0-1
+- update to 5.2.0 (2022-10-12, new features release)
 
-* Wed Jan  8 2020 Remi Collet <remi@remirepo.net> - 4.9.4-1
-- update to 4.9.4 (2020-01-08, security release)
+* Fri Feb 11 2022 Remi Collet <remi@remirepo.net> - 5.1.3-1
+- update to 5.1.3 (2022-02-10, security and bugfix release)
 
-* Fri Dec 27 2019 Remi Collet <remi@remirepo.net> - 4.9.3-1
-- update to 4.9.3 (2019-12-26, bug fix release)
+* Sun Jan 23 2022 Remi Collet <remi@remirepo.net> - 5.1.2-1
+- update to 5.1.2 (2022-01-22, security and bugfix release)
+- always use bundled libraries
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 13 2022 Remi Collet <remi@remirepo.net> - 5.1.1-4
+- fix Licence name
+- add build dependency on json ext
+
+* Fri Dec 10 2021 Remi Collet <remi@remirepo.net> - 5.1.1-3
+- add flag to use all PHP bundled libraries instead of system ones
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-2
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun  4 2021 Remi Collet <remi@remirepo.net> - 5.1.1-1
+- update to 5.1.1 (2021-06-04, bugfix release)
+
+* Wed May  5 2021 Remi Collet <remi@remirepo.net> - 5.1.0-3
+- add VERSION_SUFFIX in vendor_config.php
+- fix autoloader for pragmarx/google2fa-qrcode
+
+* Wed Feb 24 2021 Remi Collet <remi@remirepo.net> - 5.1.0-1
+- update to 5.1.0 (2021-02-24, new features release)
+- add dependency on nikic/fast-route
+- raise dependency on phpmyadmin/motranslator 5.0
+- raise dependency on phpmyadmin/twig-i18n-extension 3.0
+- raise dependency on Symfony 4.4.9
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Oct 16 2020 Remi Collet <remi@remirepo.net> - 5.0.4-1
+- update to 5.0.4 (2020-10-15, bug fix release)
+
+* Sat Oct 10 2020 Remi Collet <remi@remirepo.net> - 5.0.3-1
+- update to 5.0.3 (2020-10-10, security release)
+- raise dependency on twig 2.9 and allow v3
+- allow phpmyadmin/twig-i18n-extension v3
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Mar 24 2020 Remi Collet <remi@remirepo.net> 5.0.2-2
+- cleanup httpd configuration
+
+* Sat Mar 21 2020 Remi Collet <remi@remirepo.net> 5.0.2-1
+- update to 5.0.2 (2020-03-21, security release)
+- use phpmyadmin/twig-i18n-extension instead of twig/extensions
+
+* Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Sun Jan 19 2020 Remi Collet <remi@remirepo.net> 5.0.1-2
+- add missing depependency on williamdes/mariadb-mysql-kbs
+
+* Wed Jan  8 2020 Remi Collet <remi@remirepo.net> 5.0.1-1
+- update to 5.0.1 (2020-01-08, security release)
+
+* Fri Dec 27 2019 Remi Collet <remi@remirepo.net> 5.0.0-1
+- update to 5.0.0 (2019-12-26, new features release)
+- raise dependency on PHP 7.1.3
+- raise dependency on phpmyadmin/sql-parser 5.0
+- raise dependency on twig 2.1
+- add dependency on pragmarx/google2fa-qrcode
+- drop dependency on pragmarx/google2fa and bacon/bacon-qr-code
+- drop dependency on psr/container
+- sync spec file with remirepo one
+
+* Mon Dec  2 2019 Remi Collet <remi@remirepo.net> - 4.9.2-2
+- drop dependency on php-recode (mbstring preferred)
 
 * Fri Nov 22 2019 Remi Collet <remi@remirepo.net> - 4.9.2-1
 - update to 4.9.2 (2019-11-22, bugfix and security release)
@@ -141,6 +317,9 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$SECRET/" \
 - update to 4.9.1 (2019-09-21, bug fix release)
 - add tarball signature check
 - allow twig version 2
+
+* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
 * Tue Jun  4 2019 Remi Collet <remi@remirepo.net> - 4.9.0.1-1
 - update to 4.9.0.1 (2019-06-04, important security fixes)
@@ -464,7 +643,7 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$SECRET/" \
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.5.8.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
-* Thu Dec 12 2013 Ville Skyttä <ville.skytta@iki.fi> - 3.5.8.2-2
+* Thu Dec 12 2013 Ville SkyttÃ¤ <ville.skytta@iki.fi> - 3.5.8.2-2
 - Fix paths to changelog and license when doc dir is unversioned (#994036).
 - Fix source URL, use xz compressed tarball.
 

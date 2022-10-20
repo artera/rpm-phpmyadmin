@@ -1,2 +1,11 @@
-clog
-phpMyAdmin-?.?.*-all-languages.tar.*
+*.gz
+*.bz2
+*.xz
+*.asc
+*.zip
+*.tar
+*.bak
+*~
+*.spec
+output/
+target/

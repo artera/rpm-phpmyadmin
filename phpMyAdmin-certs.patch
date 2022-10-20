@@ -1,18 +1,12 @@
-diff -up ./libraries/classes/Utils/HttpRequest.php.rpm ./libraries/classes/Utils/HttpRequest.php
---- ./libraries/classes/Utils/HttpRequest.php.rpm	2018-03-01 15:05:29.388126314 +0100
-+++ ./libraries/classes/Utils/HttpRequest.php	2018-03-01 15:06:51.922563502 +0100
-@@ -139,12 +139,12 @@ class HttpRequest
-          *
-          * See https://letsencrypt.org/certificates/
-          */
--        $certsDir = dirname(__file__) . '/../../certs/';
-+        $certsDir = '/etc/pki/tls/';
-         /* See code below for logic */
-         if ($ssl == CURLOPT_CAPATH) {
-             $curlStatus &= curl_setopt($curlHandle, CURLOPT_CAPATH, $certsDir);
-         } elseif ($ssl == CURLOPT_CAINFO) {
--            $curlStatus &= curl_setopt($curlHandle, CURLOPT_CAINFO, $certsDir . 'cacert.pem');
-+            $curlStatus &= curl_setopt($curlHandle, CURLOPT_CAINFO, $certsDir . 'cert.pem');
-         }
+diff -up ./vendor/composer/ca-bundle/src/CaBundle.php.rpm ./vendor/composer/ca-bundle/src/CaBundle.php
+--- ./vendor/composer/ca-bundle/src/CaBundle.php.rpm	2022-01-24 15:53:57.460789560 +0100
++++ ./vendor/composer/ca-bundle/src/CaBundle.php	2022-01-24 15:55:26.021390384 +0100
+@@ -125,7 +125,7 @@ class CaBundle
+      */
+     public static function getBundledCaBundlePath()
+     {
+-        $caBundleFile = __DIR__.'/../res/cacert.pem';
++        $caBundleFile = '/etc/pki/tls/certs/ca-bundle.crt'; // System CA, always
  
-         $curlStatus &= curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+         // cURL does not understand 'phar://' paths
+         // see https://github.com/composer/ca-bundle/issues/10
