@@ -22,11 +22,7 @@ License: GPL-2.0-or-later AND MIT AND BSD 2-Clause AND BSD 3-Clause AND LGPL-3.0
 URL: https://www.phpmyadmin.net/
 Source0: https://files.phpmyadmin.net/%{name}/%{upstream_version}%{?upstream_prever:-%upstream_prever}/%{name}-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages.tar.xz
 Source1: https://files.phpmyadmin.net/%{name}/%{upstream_version}%{?upstream_prever:-%upstream_prever}/%{name}-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages.tar.xz.asc
-Source2: phpMyAdmin.htaccess
-Source3: phpMyAdmin.nginx
 Source4: https://files.phpmyadmin.net/phpmyadmin.keyring
-# List name / version / license of bundled libraries
-Source5: phpMyAdmin-bundled.php
 
 # Redirect to system certificates
 Patch0:  phpMyAdmin-certs.patch
@@ -150,7 +146,7 @@ is available in 50 languages
 %{?gpgverify:%{gpgverify} --keyring='%{SOURCE4}' --signature='%{SOURCE1}' --data='%{SOURCE0}'}
 
 %setup -qn phpMyAdmin-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages
-%patch0 -p1
+%patch 0 -p1
 rm -r vendor/composer/ca-bundle/res/
 
 # Minimal configuration file
