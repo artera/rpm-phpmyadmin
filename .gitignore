@@ -6,6 +6,5 @@
 *.tar
 *.bak
 *~
-*.spec
 output/
 target/

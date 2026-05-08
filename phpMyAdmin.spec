@@ -6,7 +6,7 @@
 #
 %{!?_pkgdocdir: %global _pkgdocdir %{_datadir}/doc/%{name}-%{version}}
 
-%global upstream_version 5.2.1
+%global upstream_version 5.2.3
 #global upstream_prever  rc1
 
 Name: phpMyAdmin
