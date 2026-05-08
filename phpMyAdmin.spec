@@ -146,7 +146,13 @@ is available in 50 languages
 %{?gpgverify:%{gpgverify} --keyring='%{SOURCE4}' --signature='%{SOURCE1}' --data='%{SOURCE0}'}
 
 %setup -qn phpMyAdmin-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages
+
+%if 0%{rhel} < 9
 %patch0 -p1
+%else
+%patch 0 -p1
+%endif
+
 rm -r vendor/composer/ca-bundle/res/
 
 # Minimal configuration file
