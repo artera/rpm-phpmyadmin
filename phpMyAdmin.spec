@@ -147,7 +147,7 @@ is available in 50 languages
 
 %setup -qn phpMyAdmin-%{upstream_version}%{?upstream_prever:-%upstream_prever}-all-languages
 
-%if 0%{rhel} < 9
+%if 0%{?rhel} < 9
 %patch0 -p1
 %else
 %patch 0 -p1
